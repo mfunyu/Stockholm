@@ -1,6 +1,11 @@
 #!/usr/bin/python3
 import argparse
 
+class Flags():
+	version = False
+	reverse = False
+	silent = False
+
 def parse_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-v", "--version", action="store_true",
@@ -9,10 +14,19 @@ def parse_args():
 						help="reverse the infection using the key")
 	parser.add_argument("-s", "--silent", action="store_true",
 						help="the program will not produce any output")
-	return parser.parse_args()
+	args = parser.parse_args()
+
+	if args.v:
+		flags.version = True
+	if args.r:
+		flags.reverse = True
+	if args.s:
+		flags.silent = True
+
+	return
 
 def main():
-	args = parse_args()
-	print(args)
+	flags = parse_args()
+	print(flags)
 
 main()

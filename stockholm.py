@@ -1,10 +1,36 @@
 #!/usr/bin/python3
 import argparse
+import os
+
+TARGET_DIR = "~/infection"
 
 class Flags():
 	version = False
 	reverse = False
 	silent = False
+
+def error_exit(msg):
+	print(f'Error:', msg)
+	exit(1)
+
+def decrypt():
+	return
+
+def encrypt():
+	return
+
+def Stockholm():
+	try:
+		if not os.path.exists(TARGET_DIR):
+			error_exit(f'{TARGET_DIR} does not exist')
+	except Exception as e:
+		error_exit(e)
+
+	if Flags.reverse:
+		encrypt()
+	else:
+		decrypt()
+
 
 def parse_args():
 	parser = argparse.ArgumentParser()
@@ -15,18 +41,20 @@ def parse_args():
 	parser.add_argument("-s", "--silent", action="store_true",
 						help="the program will not produce any output")
 	args = parser.parse_args()
-
-	if args.v:
-		flags.version = True
-	if args.r:
-		flags.reverse = True
-	if args.s:
-		flags.silent = True
-
-	return
+	print(args)
+	if args.version:
+		Flags.version = True
+	if args.reverse:
+		Flags.reverse = True
+	if args.silent:
+		Flags.silent = True
 
 def main():
-	flags = parse_args()
-	print(flags)
+	parse_args()
+	if Flags.version:
+		print('Stockholm 1.0.0')
+	else:
+		Stockholm()
+	print(Flags.version, Flags.reverse, Flags.silent)
 
 main()

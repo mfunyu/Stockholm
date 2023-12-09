@@ -2,7 +2,7 @@
 import argparse
 import os
 
-TARGET_DIR = "~/infection"
+TARGET_DIR = "infection"
 
 class Flags():
 	version = False
@@ -21,8 +21,10 @@ def encrypt():
 
 def Stockholm():
 	try:
-		if not os.path.exists(TARGET_DIR):
-			error_exit(f'{TARGET_DIR} does not exist')
+		home = os.path.expanduser('~')
+		directory = f"{home}/{TARGET_DIR}"
+		if not os.path.exists(directory):
+			error_exit(f"directory '{TARGET_DIR}' does not exist")
 	except Exception as e:
 		error_exit(e)
 

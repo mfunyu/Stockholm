@@ -27,6 +27,10 @@ def decrypt(contents):
 	return contents
 
 def encrypt(contents):
+	try:
+		return contents
+	except Exception as e:
+		error_exit(e)
 	return contents
 
 def handle_target(file):
@@ -34,16 +38,16 @@ def handle_target(file):
 		with open(file, 'r+') as f:
 			contents = f.read()
 			if Flags.reverse:
-				result = encrypt(contents)
+				result = decrypt(contents)
 				new_filename = file[:-len(EXT)]
 			else:
-				result = decrypt(contents)
+				result = encrypt(contents)
 				new_filename = file + EXT
 			os.rename(file, new_filename)
 			f.write(result)
 		if Flags.reverse:
 			print(f"decrypted: {new_filename}")
-		else
+		else:
 			print(f"encrypted: {new_filename}")
 	except Exception as e:
 		error_continue(e)

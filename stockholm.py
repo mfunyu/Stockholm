@@ -44,7 +44,9 @@ def handle_target(file):
 				result = encrypt(contents)
 				new_filename = file + EXT
 			os.rename(file, new_filename)
-			f.write(result)
+			f.truncate(0)
+			f.seek(0)
+			f.write(contents)
 		if Flags.reverse:
 			print(f"decrypted: {new_filename}")
 		else:

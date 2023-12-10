@@ -19,15 +19,18 @@ def decrypt():
 def encrypt():
 	return
 
-def Stockholm():
+def check_directory():
 	try:
 		home = os.path.expanduser('~')
-		directory = f"{home}/{TARGET_DIR}"
+		directory = home + "/" + TARGET_DIR
 		if not os.path.exists(directory):
 			error_exit(f"directory '{TARGET_DIR}' does not exist")
 	except Exception as e:
 		error_exit(e)
 
+def Stockholm():
+	check_directory()
+	
 	if Flags.reverse:
 		encrypt()
 	else:

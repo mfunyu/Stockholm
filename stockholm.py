@@ -35,16 +35,16 @@ def handle_target(file):
 			contents = f.read()
 			if Flags.reverse:
 				result = encrypt(contents)
-				f.write(result)
 				new_filename = file[:-len(EXT)]
-				os.rename(file, new_filename)
-				print(f"decrypted: {new_filename}")
 			else:
 				result = decrypt(contents)
-				f.write(result)
 				new_filename = file + EXT
-				os.rename(file, new_filename)
-				print(f"encrypted: {new_filename}")
+			os.rename(file, new_filename)
+			f.write(result)
+		if Flags.reverse:
+			print(f"decrypted: {new_filename}")
+		else
+			print(f"encrypted: {new_filename}")
 	except Exception as e:
 		error_continue(e)
 

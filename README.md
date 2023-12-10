@@ -11,3 +11,8 @@ This program only targets specific files:
 ```
 ls -R ~/infection
 ```
+
+## References
+
+- JA
+  - https://eset-info.canon-its.jp/malware_info/special/detail/230914.html

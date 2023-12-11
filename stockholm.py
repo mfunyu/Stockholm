@@ -19,86 +19,87 @@ def error_exit(msg):
 def error_continue(msg):
 	print(f'Error:', msg)
 
-def decrypt(contents):
-	try:
+class Stockholm:
+	def decrypt(self, contents):
+		try:
+			return contents
+		except Exception as e:
+			error_exit(e)
 		return contents
-	except Exception as e:
-		error_exit(e)
-	return contents
 
-def encrypt(contents):
-	try:
+	def encrypt(self, contents):
+		try:
+			return contents
+		except Exception as e:
+			error_exit(e)
 		return contents
-	except Exception as e:
-		error_exit(e)
-	return contents
 
-def handle_target(file):
-	try:
-		with open(file, 'r+') as f:
-			contents = f.read()
+	def handle_target(self, file):
+		try:
+			with open(file, 'r+') as f:
+				contents = f.read()
+				if Flags.reverse:
+					result = self.decrypt(contents)
+					new_filename = file[:-len(EXT)]
+				else:
+					result = self.encrypt(contents)
+					new_filename = file + EXT
+				os.rename(file, new_filename)
+				f.truncate(0)
+				f.seek(0)
+				f.write(contents)
 			if Flags.reverse:
-				result = decrypt(contents)
-				new_filename = file[:-len(EXT)]
+				print(f"decrypted: {new_filename}")
 			else:
-				result = encrypt(contents)
-				new_filename = file + EXT
-			os.rename(file, new_filename)
-			f.truncate(0)
-			f.seek(0)
-			f.write(contents)
+				print(f"encrypted: {new_filename}")
+		except Exception as e:
+			error_continue(e)
+
+	def get_targets(self, dir_path, files, exts):
+		contents = os.listdir(dir_path)
+		for f in contents:
+			filename = dir_path + "/" + f
+			if not os.path.isfile(filename):
+				get_targets(filename, files, exts)
+			ext_idx = filename.rfind(".")
+			if ext_idx >= 0 and filename[ext_idx:] in exts:
+				files.append(filename)
+
+	def get_extensions(self):
+		try:
+			with open(EXTENSIONS_FILE, 'r') as f:
+				contents = f.readlines()
+			extensions = set()
+			for line in contents:
+				extensions.add(line.strip())
+			return extensions
+		except Exception as e:
+			error_exit(e)
+
+	def check_directory(self):
+		try:
+			home = os.path.expanduser('~')
+			dir_path = home + "/" + TARGET_DIR
+			if not os.path.exists(dir_path):
+				error_exit(f"directory '{TARGET_DIR}' does not exist")
+			return dir_path
+		except Exception as e:
+			error_exit(e)
+
+	def stockholm(self):
+		dir_path = self.check_directory()
+		files = []
 		if Flags.reverse:
-			print(f"decrypted: {new_filename}")
+			self.get_targets(dir_path, files, [EXT])
 		else:
-			print(f"encrypted: {new_filename}")
-	except Exception as e:
-		error_continue(e)
+			exts = self.get_extensions()
+			self.get_targets(dir_path, files, exts)
 
-def get_targets(dir_path, files, exts):
-	contents = os.listdir(dir_path)
-	for f in contents:
-		filename = dir_path + "/" + f
-		if not os.path.isfile(filename):
-			get_targets(filename, files, exts)
-		ext_idx = filename.rfind(".")
-		if ext_idx >= 0 and filename[ext_idx:] in exts:
-			files.append(filename)
+		if not files:
+			error_exit(f"target files does not exist")
 
-def get_extensions():
-	try:
-		with open(EXTENSIONS_FILE, 'r') as f:
-			contents = f.readlines()
-		extensions = set()
-		for line in contents:
-			extensions.add(line.strip())
-		return extensions
-	except Exception as e:
-		error_exit(e)
-
-def check_directory():
-	try:
-		home = os.path.expanduser('~')
-		dir_path = home + "/" + TARGET_DIR
-		if not os.path.exists(dir_path):
-			error_exit(f"directory '{TARGET_DIR}' does not exist")
-		return dir_path
-	except Exception as e:
-		error_exit(e)
-
-def Stockholm():
-	dir_path = check_directory()
-	files = []
-	if Flags.reverse:
-		get_targets(dir_path, files, [EXT])
-	else:
-		exts = get_extensions()
-		get_targets(dir_path, files, exts)
-
-	if not files:
-		error_exit(f"target files does not exist")
-
-	for file in files:
-		handle_target(file)
+		for file in files:
+			self.handle_target(file)
 
 def parse_args():
 	parser = argparse.ArgumentParser()
@@ -122,7 +123,9 @@ def main():
 	if Flags.version:
 		print(f"Stockholm {VERSION}")
 	else:
-		Stockholm()
+		stockholm = Stockholm()
+		stockholm.stockholm()
 	print(Flags.version, Flags.reverse, Flags.silent)
 
-main()
+if __name__ == '__main__':
+	main()

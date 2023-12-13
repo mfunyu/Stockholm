@@ -24,7 +24,6 @@ def error_exit(msg):
 	exit(1)
 
 def error_continue(msg):
-	print(f" -> {Style.RED}fail{Style.RESET}")
 	print(f'Error:', msg)
 
 class Stockholm:
@@ -34,6 +33,11 @@ class Stockholm:
 			self.key = bytes.fromhex(key)
 		else:
 			self.key = os.urandom(32)
+
+	def log(self, msg, end="\n"):
+		if Flags.silent:
+			return
+		print(msg, end=end)
 
 	def decrypt(self, contents):
 		nonce = contents[:16]
@@ -52,10 +56,10 @@ class Stockholm:
 		try:
 			if Flags.reverse:
 				new_filename = file[:-len(EXT)]
-				print(f"decrypt: {file}", end="")
+				self.log(f"decrypt: {file}", "")
 			else:
 				new_filename = file + EXT
-				print(f"encrypt: {file}", end="")
+				self.log(f"encrypt: {file}", "")
 
 			with open(file, 'r+b') as f:
 				contents = f.read()
@@ -67,9 +71,10 @@ class Stockholm:
 				f.truncate(0)
 				f.seek(0)
 				f.write(result)
-			print(f" -> {Style.GREEN}{new_filename}{Style.RESET}")
+			self.log(f" -> {Style.GREEN}{new_filename}{Style.RESET}")
 			self.succss = self.succss + 1
 		except Exception as e:
+			self.log(f" -> {Style.RED}fail{Style.RESET}")
 			error_continue(e)
 
 	def get_targets(self, dir_path, files, exts):

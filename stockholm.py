@@ -152,8 +152,11 @@ def main():
 	if Flags.version:
 		print(f"Stockholm {VERSION}")
 	else:
-		stockholm = Stockholm(args.reverse)
-		stockholm.stockholm()
+		try:
+			stockholm = Stockholm(args.reverse)
+			stockholm.stockholm()
+		except Exception as e:
+			error_exit(e)
 
 if __name__ == '__main__':
 	main()

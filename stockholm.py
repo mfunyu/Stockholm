@@ -8,6 +8,12 @@ TARGET_DIR = "infection"
 EXT = ".ft"
 EXTENSIONS_FILE = "wannacry_file_extensions.txt"
 
+class Style():
+	RED = "\x1b[31m"
+	GREEN = "\x1b[32m"
+	CYAN = "\x1b[96m"
+	RESET = "\033[0m"
+
 class Flags():
 	version = False
 	reverse = False
@@ -18,7 +24,7 @@ def error_exit(msg):
 	exit(1)
 
 def error_continue(msg):
-	print(" -> fail")
+	print(f" -> {Style.RED}fail{Style.RESET}")
 	print(f'Error:', msg)
 
 class Stockholm:
@@ -61,7 +67,7 @@ class Stockholm:
 				f.truncate(0)
 				f.seek(0)
 				f.write(result)
-			print(f" -> {new_filename}")
+			print(f" -> {Style.GREEN}{new_filename}{Style.RESET}")
 			self.succss = self.succss + 1
 		except Exception as e:
 			error_continue(e)
@@ -113,7 +119,7 @@ class Stockholm:
 			self.handle_target(file)
 
 		if not Flags.reverse and self.succss:
-			print(f"secret key: {bytes.hex(self.key)}")
+			print(f"secret key: {Style.CYAN}{bytes.hex(self.key)}")
 
 def parse_args():
 	parser = argparse.ArgumentParser()

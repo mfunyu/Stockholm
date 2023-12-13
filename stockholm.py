@@ -18,52 +18,51 @@ def error_exit(msg):
 	exit(1)
 
 def error_continue(msg):
+	print(" -> fail")
 	print(f'Error:', msg)
 
 class Stockholm:
 	def __init__(self, key):
+		self.succss = 0
 		if key:
 			self.key = bytes.fromhex(key)
 		else:
 			self.key = os.urandom(32)
 
 	def decrypt(self, contents):
-		try:
-			nonce = contents[:16]
-			tag = contents[16:32]
-			ciphertext = contents[32:]
-			cipher = AES.new(self.key, AES.MODE_EAX, nonce)
-			data = cipher.decrypt_and_verify(ciphertext, tag)
-			return data
-		except Exception as e:
-			error_exit(e)
+		nonce = contents[:16]
+		tag = contents[16:32]
+		ciphertext = contents[32:]
+		cipher = AES.new(self.key, AES.MODE_EAX, nonce)
+		data = cipher.decrypt_and_verify(ciphertext, tag)
+		return data
 
 	def encrypt(self, contents):
-		try:
-			cipher = AES.new(self.key, AES.MODE_EAX)
-			ciphertext, tag = cipher.encrypt_and_digest(contents)
-			return cipher.nonce + tag + ciphertext
-		except Exception as e:
-			error_exit(e)
+		cipher = AES.new(self.key, AES.MODE_EAX)
+		ciphertext, tag = cipher.encrypt_and_digest(contents)
+		return cipher.nonce + tag + ciphertext
 
 	def handle_target(self, file):
 		try:
+			if Flags.reverse:
+				new_filename = file[:-len(EXT)]
+				print(f"decrypt: {file}", end="")
+			else:
+				new_filename = file + EXT
+				print(f"encrypt: {file}", end="")
+
 			with open(file, 'r+b') as f:
 				contents = f.read()
 				if Flags.reverse:
 					result = self.decrypt(contents)
-					new_filename = file[:-len(EXT)]
 				else:
 					result = self.encrypt(contents)
-					new_filename = file + EXT
 				os.rename(file, new_filename)
 				f.truncate(0)
 				f.seek(0)
 				f.write(result)
-			if Flags.reverse:
-				print(f"decrypted: {new_filename}")
-			else:
-				print(f"encrypted: {new_filename}")
+			print(f" -> {new_filename}")
+			self.succss = self.succss + 1
 		except Exception as e:
 			error_continue(e)
 
@@ -113,7 +112,7 @@ class Stockholm:
 		for file in files:
 			self.handle_target(file)
 
-		if not Flags.reverse:
+		if not Flags.reverse and self.succss:
 			print(f"secret key: {bytes.hex(self.key)}")
 
 def parse_args():
@@ -125,7 +124,7 @@ def parse_args():
 	parser.add_argument("-s", "--silent", action="store_true",
 						help="the program will not produce any output")
 	args = parser.parse_args()
-	print(args)
+
 	if args.version:
 		Flags.version = True
 	if args.reverse:
@@ -141,7 +140,6 @@ def main():
 	else:
 		stockholm = Stockholm(args.reverse)
 		stockholm.stockholm()
-	print(Flags.version, Flags.reverse, Flags.silent)
 
 if __name__ == '__main__':
 	main()

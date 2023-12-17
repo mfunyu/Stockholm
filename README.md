@@ -18,8 +18,30 @@ Encrypted files can be restored using the secret key.
 This program only targets specific files:
 - located inside `$HOME/infection` directory
 - have extensions which are listed in `wannacry_file_extensions.txt` file
+
+example
 ```
-ls -R ~/infection
+$> tree ~/infection
+~/infection
+├── dir0
+│   ├── empty0.docx
+│   ├── empty1.docx
+│   ├── empty2.docx
+│   ├── empty3.docx
+│   ├── empty4.docx
+│   └── empty5.docx
+├── dir1
+│   ├── long0.123
+│   ├── long1.123
+│   └── long2.123
+├── dir2
+│   ├── test1.txt.ft
+│   ├── test2.txt.ft
+│   └── test3.txt.ft
+├── dir3
+├── file1.docx
+├── file2.docx
+└── no_perm.key
 ```
 
 ## Usage

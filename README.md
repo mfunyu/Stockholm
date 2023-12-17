@@ -6,10 +6,12 @@
 
 This program encrypts the contents of target files using `AES-128`.
 On success, it add extiontion `.ft` encrypted files.
+<img width="669" alt="Capture d’écran 2023-12-17 à 17 03 12" src="https://github.com/mfunyu/Stockholm/assets/60470877/e4b5a91b-607a-44ef-93e6-09245da3ab53">
 
 It will only act on files whose extensions have been targetted by `Wannacry`.
 
 Encrypted files can be restored using the secret key.
+<img width="690" alt="Capture d’écran 2023-12-17 à 17 03 33" src="https://github.com/mfunyu/Stockholm/assets/60470877/08b5084f-f1cb-48db-9ca5-37cf3a2b88fe">
 
 
 ## Target Files
